@@ -9,13 +9,53 @@
     const handleResponse = (xhr, parseResponse) => {
       const content = document.querySelector('#content');
       
+      switch(xhr.status){
+        case 200:
+          content.innerHTML = '<b>Success</b>';
+          break;
+          case 201:
+          content.innerHTML = '<b>Created</b>';
+          break;
+          case 400:
+          content.innerHTML = '<b>Bad Request</b>';
+          break;
+          case 404:
+          content.innerHTML = '<b>Resource not Found</b>';
+          break;
+          default:
+          content.innerHTML = '<b>Status code not implemented</b>';
+          break;
+      }
+
+      if(parseResponse){
+        const obj = JSON.parse(xhr.response);
+        console.dir(obj);
+
+        content.innerHTML += `<p>${xhr.response}</p>`;
+      }else{
+        content.innerHTML += `<p>Metadata Recieved</p>`;
+      }
     };
 
     const requestUpdate = (e, userForm) => {
       const url = userForm.querySelector('#urlField').value;
       const method = userForm.querySelector('#methodSelect').value;
       
+      const xhr = new XMLHttpRequest();
+      xhr.open(method,url);
 
+      xhr.setRequestHeader('Accept', 'application/json');
+
+      if(method === 'get'){
+        xhr.onload = () => handleResponse(xhr,true);
+      }else{
+        xhr.onload = () => handleResponse(xhr,false);
+      }
+
+      xhr.send();
+
+      e.preventDefault();
+      return false; //prevents dom bubbling
     };
 
 
